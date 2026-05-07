@@ -3,27 +3,62 @@
   "version": "0.1.0",
   "description": "Local-first CLI that turns JSON/YAML policy changes into reviewer-ready risk summaries.",
   "type": "module",
-  "bin": { "policydiff": "./dist/cli.js" },
+  "bin": {
+    "policydiff": "./dist/cli.js"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
-  "files": ["dist", "README.md", "LICENSE", "SECURITY.md"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md"
+  ],
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "npm run clean && tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test dist/**/*.test.js",
-    "smoke": "npm run build && node dist/cli.js compare fixtures/before fixtures/after --format text && node dist/cli.js compare fixtures/before fixtures/after --format json --output /tmp/policydiff-smoke.json && node dist/cli.js explain /tmp/policydiff-smoke.json --format markdown",
+    "smoke": "npm run build && node dist/cli.js compare fixtures/before fixtures/after --format text; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/cli.js compare fixtures/before fixtures/after --format json --output /tmp/policydiff-smoke.json; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/cli.js explain /tmp/policydiff-smoke.json --format markdown",
     "package:smoke": "npm pack --dry-run",
     "release:check": "npm test && npm run package:smoke"
   },
-  "keywords": ["policy", "diff", "security", "yaml", "json", "cli", "github-actions", "agent-safety"],
+  "keywords": [
+    "policy",
+    "diff",
+    "security",
+    "yaml",
+    "json",
+    "cli",
+    "github-actions",
+    "agent-safety"
+  ],
   "author": "Roger Chappel",
   "license": "MIT",
-  "dependencies": { "commander": "^12.1.0", "js-yaml": "^4.1.0" },
-  "devDependencies": { "@types/js-yaml": "^4.0.9", "@types/node": "^22.10.2", "typescript": "^5.7.2" },
-  "engines": { "node": ">=20" },
-  "repository": { "type": "git", "url": "git+https://github.com/rogerchappel/policydiff.git" },
-  "bugs": { "url": "https://github.com/rogerchappel/policydiff/issues" },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogerchappel/policydiff.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rogerchappel/policydiff/issues"
+  },
   "homepage": "https://github.com/rogerchappel/policydiff#readme"
 }
