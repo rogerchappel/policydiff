@@ -1,0 +1,8 @@
+{
+  "agent": "reviewer",
+  "tools": {
+    "allow": ["read", "web_search", "exec"],
+    "deny": ["message"]
+  },
+  "requireApproval": false
+}
