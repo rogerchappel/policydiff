@@ -5,7 +5,7 @@ import { classifyChange } from '../src/rules.js';
 test('classifies widened permissions as high severity', () => {
   const change = classifyChange({ path: '/permissions/contents', kind: 'changed', before: 'read', after: 'write', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
   assert.equal(change.severity, 'high');
-  assert.equal(change.category, 'permission');
+  assert.equal(change.ruleId, 'github.permission.write');
 });
 
 test('classifies disabled approvals as critical guardrail removal', () => {
