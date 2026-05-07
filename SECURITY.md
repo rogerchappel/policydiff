@@ -2,57 +2,29 @@
 
 ## Supported Versions
 
-Replace this section with the supported versions for `policydiff`.
+`policydiff` is pre-1.0. Security fixes are provided on the latest released version and the `main` branch as maintainer capacity allows.
 
-Example:
-
-```md
 | Version | Supported |
 | --- | --- |
-| .x | Yes |
-| < .0 | No |
-```
-
-If the project does not publish versioned releases yet, say that clearly.
+| 0.1.x | Yes |
+| < 0.1.0 | No |
 
 ## Reporting a Vulnerability
 
-Please do not report suspected vulnerabilities in public issues, pull requests, or discussions.
+Please use GitHub private vulnerability reporting when available for `rogerchappel/policydiff`. If it is not enabled, open a public issue asking for a private contact path **without** including exploit details, secrets, private policy files, or sensitive configuration.
 
-Ask maintainers for the private security reporting path before sharing details.
+## Handling Sensitive Policy Files
 
-If no private reporting path exists yet, ask maintainers through public project channels for a private reporting path. Do not include exploit details, secrets, personal data, or sensitive technical details in public messages.
-
-## What to Include
-
-When a private reporting path is available, include:
-
-- A clear description of the issue.
-- Affected versions, files, packages, workflows, or configuration.
-- Steps to reproduce, proof of concept, or attack scenario when safe to share.
-- Potential impact.
-- Suggested mitigation, if known.
-
-## Response Expectations
-
-Maintainers review good-faith reports as capacity allows.
-
-Do not imply paid support, guaranteed response times, guaranteed fixes, or service-level agreements unless `policydiff` explicitly provides them.
+`policydiff` is local-first and does not upload files. When reporting bugs, reduce inputs to minimal sanitized JSON/YAML fixtures before sharing them publicly.
 
 ## Scope
 
 In scope:
 
-- Vulnerabilities in policydiff.
-- Insecure default configuration shipped by this project.
-- CI, release, or dependency guidance maintained by this project.
+- Vulnerabilities in the CLI parser, renderer, packaging, release, or CI configuration.
+- Insecure default guidance shipped by this project.
 
 Out of scope:
 
-- General support requests.
-- Requests for guaranteed maintenance timelines.
-- Issues in unrelated downstream projects.
-
-## Disclosure
-
-Coordinate disclosure with maintainers before publishing vulnerability details.
+- Security issues in downstream policy files analyzed by `policydiff`.
+- General support requests or requests for guaranteed maintenance timelines.
