@@ -12,6 +12,8 @@ Before opening an issue:
 - Confirm the issue applies to `policydiff`.
 - Include enough context for maintainers to understand or reproduce the request.
 
+Bug reports should include sanitized fixtures when possible. Please do not attach private policy files or secrets.
+
 Bug reports should include:
 
 - What happened.
@@ -61,6 +63,15 @@ Next recommended task:
 ```
 
 ## Verification
+
+For code changes, prefer:
+
+```bash
+npm test
+npm run check
+npm run build
+npm run smoke
+```
 
 Every contribution should include verification.
 
