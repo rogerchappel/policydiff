@@ -15,7 +15,7 @@
     }
   },
   "files": [
-    "dist",
+    "dist/src",
     "README.md",
     "LICENSE",
     "SECURITY.md"
