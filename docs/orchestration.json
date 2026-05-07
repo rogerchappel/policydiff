@@ -1,0 +1,13 @@
+{
+  "project": "policydiff",
+  "runDate": "2026-05-08",
+  "mode": "oss-factory-mvp",
+  "repo": "rogerchappel/policydiff",
+  "stages": [
+    { "id": "prd", "status": "done", "artifacts": ["docs/PRD.md"] },
+    { "id": "planning", "status": "done", "artifacts": ["docs/TASKS.md", "docs/ORCHESTRATION.md", "docs/orchestration.json"] },
+    { "id": "implementation", "status": "done", "artifacts": ["src"] },
+    { "id": "verification", "status": "done", "commands": ["npm test", "npm run check", "npm run build", "npm run smoke", "bash scripts/validate.sh"] },
+    { "id": "publish", "status": "done", "target": "https://github.com/rogerchappel/policydiff" }
+  ]
+}
