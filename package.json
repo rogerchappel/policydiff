@@ -4,14 +4,14 @@
   "description": "Local-first CLI that turns JSON/YAML policy changes into reviewer-ready risk summaries.",
   "type": "module",
   "bin": {
-    "policydiff": "./dist/cli.js"
+    "policydiff": "./dist/src/cli.js"
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
     }
   },
   "files": [
@@ -25,7 +25,7 @@
     "build": "npm run clean && tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test dist/**/*.test.js",
-    "smoke": "npm run build && node dist/cli.js compare fixtures/before fixtures/after --format text; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/cli.js compare fixtures/before fixtures/after --format json --output /tmp/policydiff-smoke.json; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/cli.js explain /tmp/policydiff-smoke.json --format markdown",
+    "smoke": "npm run build && node dist/src/cli.js compare fixtures/before fixtures/after --format text; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/src/cli.js compare fixtures/before fixtures/after --format json --output /tmp/policydiff-smoke.json; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/src/cli.js explain /tmp/policydiff-smoke.json --format markdown",
     "package:smoke": "npm pack --dry-run",
     "release:check": "npm test && npm run package:smoke"
   },
