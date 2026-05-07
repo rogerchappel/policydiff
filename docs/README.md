@@ -7,6 +7,10 @@ This directory holds project documentation.
 - [Contributing guide](../CONTRIBUTING.md)
 - [Security policy](../SECURITY.md)
 - [Agent instructions](../AGENTS.md)
+- [Product requirements](PRD.md)
+- [MVP tasks](TASKS.md)
+- [Orchestration notes](ORCHESTRATION.md)
+- [Rule heuristics](RULES.md)
 
 ## Additional docs
 
