@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "test": "node --test",
+    "postinstall": "node scripts/setup.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
