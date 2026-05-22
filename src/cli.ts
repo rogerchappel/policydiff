@@ -36,6 +36,12 @@ function parseFormat(value: string): 'text' | 'markdown' | 'json' {
 }
 
 program.parseAsync(process.argv).catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : String(error));
+  if (error instanceof Error && 'code' in error && (error as NodeJS.ErrnoException).code === 'ENOENT') {
+    console.error(`policydiff: file or directory not found: ${(error as NodeJS.ErrnoException).path ?? (error as Error).message}`);
+  } else if (error instanceof Error) {
+    console.error(`policydiff: ${error.message}`);
+  } else {
+    console.error(`policydiff: ${String(error)}`);
+  }
   process.exit(1);
 });
