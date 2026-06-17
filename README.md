@@ -50,6 +50,10 @@ bash demo/review-agent-policy-change.sh
 
 The script writes Markdown, JSON, and explained reports to `${TMPDIR:-/tmp}/policydiff-demo`. See [docs/tutorials/review-agent-policy-change.md](docs/tutorials/review-agent-policy-change.md) for the full reviewer workflow.
 
+Use [`examples/pr-comment-template.md`](examples/pr-comment-template.md) when
+attaching the demo report to a pull request review. For promotion or screencast
+prep, see [`docs/promo/video-brief.md`](docs/promo/video-brief.md).
+
 ## What it detects
 
 - Generic JSON/YAML additions, removals, and changes.
