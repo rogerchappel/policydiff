@@ -16,6 +16,23 @@ npm run build
 node dist/cli.js --help
 ```
 
+## Quickstart
+
+Run the checked-in policy fixture comparison and print the reviewer summary:
+
+```bash
+npm install
+npm run build
+node dist/src/cli.js compare fixtures/before fixtures/after --format text
+```
+
+For a release-style smoke, write JSON evidence and render the explanation:
+
+```bash
+node dist/src/cli.js compare fixtures/before fixtures/after --format json --output /tmp/policydiff-smoke.json
+node dist/src/cli.js explain /tmp/policydiff-smoke.json --format markdown
+```
+
 ## Compare files or directories
 
 ```bash
