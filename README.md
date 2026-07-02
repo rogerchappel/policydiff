@@ -16,6 +16,23 @@ npm run build
 node dist/cli.js --help
 ```
 
+## Quickstart
+
+Run the checked-in policy fixture comparison and print the reviewer summary:
+
+```bash
+npm install
+npm run build
+node dist/src/cli.js compare fixtures/before fixtures/after --format text
+```
+
+For a release-style smoke, write JSON evidence and render the explanation:
+
+```bash
+node dist/src/cli.js compare fixtures/before fixtures/after --format json --output /tmp/policydiff-smoke.json
+node dist/src/cli.js explain /tmp/policydiff-smoke.json --format markdown
+```
+
 ## Compare files or directories
 
 ```bash
@@ -40,15 +57,24 @@ policydiff compare fixtures/before fixtures/after --format json --output diff.js
 policydiff explain diff.json --format markdown
 ```
 
-## Runnable demo
+## Demo walkthrough
 
-```bash
+Try either agent policy review demo with checked-in before/after fixtures:
+
+```sh
 bash demo/run-agent-policy-review.sh
+bash demo/review-agent-policy-change.sh
 ```
 
-The demo compares checked-in agent-policy fixtures, saves a JSON report, and
-explains the report as Markdown. See
-[Agent Policy Review Demo](docs/tutorials/agent-policy-review.md).
+The demos compare checked-in agent-policy fixtures, save JSON evidence, and
+explain reports as Markdown. See
+[Agent Policy Review Demo](docs/tutorials/agent-policy-review.md) and
+[docs/tutorials/review-agent-policy-change.md](docs/tutorials/review-agent-policy-change.md)
+for reviewer workflows.
+
+Use [`examples/pr-comment-template.md`](examples/pr-comment-template.md) when
+attaching the demo report to a pull request review. For promotion or screencast
+prep, see [`docs/promo/video-brief.md`](docs/promo/video-brief.md).
 
 ## What it detects
 
