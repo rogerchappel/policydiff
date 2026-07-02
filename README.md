@@ -59,13 +59,18 @@ policydiff explain diff.json --format markdown
 
 ## Demo walkthrough
 
-Try the agent policy review demo with checked-in before/after fixtures:
+Try either agent policy review demo with checked-in before/after fixtures:
 
 ```sh
+bash demo/run-agent-policy-review.sh
 bash demo/review-agent-policy-change.sh
 ```
 
-The script writes Markdown, JSON, and explained reports to `${TMPDIR:-/tmp}/policydiff-demo`. See [docs/tutorials/review-agent-policy-change.md](docs/tutorials/review-agent-policy-change.md) for the full reviewer workflow.
+The demos compare checked-in agent-policy fixtures, save JSON evidence, and
+explain reports as Markdown. See
+[Agent Policy Review Demo](docs/tutorials/agent-policy-review.md) and
+[docs/tutorials/review-agent-policy-change.md](docs/tutorials/review-agent-policy-change.md)
+for reviewer workflows.
 
 Use [`examples/pr-comment-template.md`](examples/pr-comment-template.md) when
 attaching the demo report to a pull request review. For promotion or screencast
