@@ -40,6 +40,16 @@ policydiff compare fixtures/before fixtures/after --format json --output diff.js
 policydiff explain diff.json --format markdown
 ```
 
+## Runnable demo
+
+```bash
+bash demo/run-agent-policy-review.sh
+```
+
+The demo compares checked-in agent-policy fixtures, saves a JSON report, and
+explains the report as Markdown. See
+[Agent Policy Review Demo](docs/tutorials/agent-policy-review.md).
+
 ## What it detects
 
 - Generic JSON/YAML additions, removals, and changes.
