@@ -1,7 +1,8 @@
 # PolicyDiff Social Hooks
 
 Grounded source: `README.md`, `examples/agent-policy-before.json`,
-`examples/agent-policy-after.json`, `demo/run-agent-policy-review.sh`, and
+`examples/agent-policy-after.json`, `demo/agent-policy-review.sh`,
+`demo/run-agent-policy-review.sh`, and
 `demo/review-agent-policy-change.sh`.
 
 ## Short hooks
@@ -12,6 +13,8 @@ Grounded source: `README.md`, `examples/agent-policy-before.json`,
 - The CLI can write JSON for automation and explain saved reports as Markdown.
 - Critical detections intentionally use exit code `2`, so CI can distinguish
   risk from parser failure.
+- The CLI runs locally, so reviewers can use sanitized fixtures instead of
+  pasting private policy files into a remote service.
 
 ## Short posts
 
@@ -20,6 +23,15 @@ Grounded source: `README.md`, `examples/agent-policy-before.json`,
 2. New demo: `bash demo/review-agent-policy-change.sh` compares checked-in before/after agent policy fixtures and writes Markdown, JSON, and explained reports under `/tmp`.
 
 3. Exit code `2` in PolicyDiff means the compare ran and found a critical change. That makes it useful as a review gate without hiding the report reviewers need.
+
+4. Demo arc: add `exec` to an agent policy and disable approval. PolicyDiff highlights both the permission widening and removed guardrail.
+
+## Demo command
+
+```sh
+npm run build
+bash demo/agent-policy-review.sh
+```
 
 ## Video angle
 
@@ -30,3 +42,14 @@ Open `examples/agent-policy-before.json` and
 directories with matching basenames so the output focuses on field changes.
 
 Start with the two agent policy fixtures, run the demo script, then show the Markdown report and the explained report. The story: noisy policy edits become a short review queue.
+
+## Launch note draft
+
+PolicyDiff is a local-first CLI for comparing JSON/YAML policy and config
+changes. It highlights generic additions/removals plus reviewer-relevant risk
+signals such as widened permissions, removed approvals, package lifecycle script
+changes, CORS/network exposure, and secret-adjacent paths.
+
+Limitations: it is a practical review assistant, not a formal verifier. It does
+not prove a policy is safe and should be paired with human review for production,
+security, billing, and auth changes.
