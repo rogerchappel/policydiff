@@ -23,13 +23,7 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Typecheck
-        run: npm run check
-      - name: Test
-        run: npm test
-      - name: Build
-        run: npm run build
-      - name: Smoke test
-        run: npm run smoke
+      - name: Run release checks
+        run: npm run release:check
       - name: Validate repository
         run: bash scripts/validate.sh
