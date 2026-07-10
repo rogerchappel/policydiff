@@ -78,6 +78,17 @@ Use [`examples/pr-comment-template.md`](examples/pr-comment-template.md) when
 attaching the demo report to a pull request review. For promotion or screencast
 prep, see [`docs/promo/video-brief.md`](docs/promo/video-brief.md).
 
+For a narrower GitHub Actions permission review, run:
+
+```sh
+bash demo/github-actions-permissions-review.sh
+```
+
+This compares the checked-in workflow fixtures and writes Markdown plus JSON
+evidence under `${TMPDIR:-/tmp}/policydiff-actions-permissions`. Promotion-ready
+hooks live in
+[`docs/promo/github-actions-permissions-social-hooks.md`](docs/promo/github-actions-permissions-social-hooks.md).
+
 ## What it detects
 
 - Generic JSON/YAML additions, removals, and changes.
