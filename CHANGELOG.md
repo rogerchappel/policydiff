@@ -11,6 +11,11 @@ format and uses semantic versioning when versioned releases are published.
 
 - Initial project setup.
 
+### Fixed
+
+- Classify meaningful leaf changes in wholly added or removed JSON/YAML files
+  instead of reporting a single generic root change.
+
 ## Release Links
 
 - Unreleased:

@@ -98,6 +98,11 @@ hooks live in
 - Package lifecycle or executable script changes.
 - Network exposure/CORS changes and secret-adjacent path changes.
 
+Wholly added or removed JSON/YAML files are expanded into deterministic leaf
+changes. This lets the same path-based rules classify their settings—for
+example, an added workflow containing `permissions.contents: write` is reported
+at `/permissions/contents` as a high-severity GitHub Actions permission change.
+
 `policydiff` is not a formal verifier. It is a practical reviewer assistant that highlights likely-risky config diffs.
 
 ## Verification
