@@ -15,6 +15,7 @@ format and uses semantic versioning when versioned releases are published.
 
 - Classify meaningful leaf changes in wholly added or removed JSON/YAML files
   instead of reporting a single generic root change.
+- Update `js-yaml` to 4.3.0 to address upstream parser vulnerabilities.
 
 ## Release Links
 
