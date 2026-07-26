@@ -103,6 +103,13 @@ changes. This lets the same path-based rules classify their settings—for
 example, an added workflow containing `permissions.contents: write` is reported
 at `/permissions/contents` as a high-severity GitHub Actions permission change.
 
+Scalar arrays below `permissions`, `scopes`, `allow`, `allowed`, `tools`,
+`capabilities`, or `roles` paths are compared as unordered multisets. Reordering
+the same entries therefore produces no change, while additions and removals
+retain deterministic indexed paths and their permission severity. Arrays on
+other paths—and arrays containing objects or nested arrays—remain
+order-sensitive.
+
 `policydiff` is not a formal verifier. It is a practical reviewer assistant that highlights likely-risky config diffs.
 
 ## Verification
