@@ -1,5 +1,5 @@
 {
-  "name": "policydiff",
+  "name": "@rogerchappel/policydiff",
   "version": "0.1.0",
   "description": "Local-first CLI that turns JSON/YAML policy changes into reviewer-ready risk summaries.",
   "type": "module",
@@ -33,8 +33,9 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test dist/**/*.test.js",
     "smoke": "npm run build && node dist/src/cli.js compare fixtures/before fixtures/after --format text; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/src/cli.js compare fixtures/before fixtures/after --format json --output /tmp/policydiff-smoke.json; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/src/cli.js explain /tmp/policydiff-smoke.json --format markdown",
+    "package:identity": "node scripts/check-package-identity.mjs",
     "package:smoke": "npm run build && node scripts/package-smoke.mjs",
-    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke"
+    "release:check": "npm run package:identity && npm run check && npm test && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "policy",
@@ -67,5 +68,8 @@
   "bugs": {
     "url": "https://github.com/rogerchappel/policydiff/issues"
   },
-  "homepage": "https://github.com/rogerchappel/policydiff#readme"
+  "homepage": "https://github.com/rogerchappel/policydiff#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }

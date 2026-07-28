@@ -5,7 +5,8 @@
 ## Install
 
 ```bash
-npm install -g policydiff
+npm install -g @rogerchappel/policydiff
+policydiff --version
 ```
 
 For local development:
@@ -154,4 +155,7 @@ npm run package:smoke
 npm run release:check
 ```
 
-The package smoke uses `npm pack --dry-run` so the published file list can be reviewed without publishing.
+The package identity check verifies that the npm name is either unclaimed or
+already points at this repository. The package smoke installs the generated
+tarball into a temporary prefix and runs its `policydiff` binary and version,
+without publishing.
