@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const projectRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const packageJson = JSON.parse(readFileSync(join(projectRoot, 'package.json'), 'utf8'));
 
 const requiredPaths = [
   'dist/src/cli.js',
@@ -27,21 +33,47 @@ if (missingLocalPaths.length > 0) {
   process.exit(1);
 }
 
-const output = execFileSync('npm', ['pack', '--dry-run', '--json'], {
-  encoding: 'utf8',
-  stdio: ['ignore', 'pipe', 'inherit']
-});
+const temporaryDirectory = mkdtempSync(join(tmpdir(), 'policydiff-package-smoke-'));
 
-const [pack] = JSON.parse(output);
-const packedFiles = new Set(pack.files.map((file) => file.path));
-const missingPackedPaths = requiredPaths.filter((path) => !packedFiles.has(path));
+try {
+  const output = execFileSync('npm', ['pack', '--json', '--pack-destination', temporaryDirectory], {
+    cwd: projectRoot,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'inherit']
+  });
 
-if (missingPackedPaths.length > 0) {
-  console.error('Missing files from npm pack dry-run:');
-  for (const path of missingPackedPaths) {
-    console.error(`- ${path}`);
+  const [pack] = JSON.parse(output);
+  const packedFiles = new Set(pack.files.map((file) => file.path));
+  const missingPackedPaths = requiredPaths.filter((path) => !packedFiles.has(path));
+
+  if (missingPackedPaths.length > 0) {
+    console.error('Missing files from npm package:');
+    for (const path of missingPackedPaths) {
+      console.error(`- ${path}`);
+    }
+    process.exitCode = 1;
+  } else {
+    const installPrefix = join(temporaryDirectory, 'install');
+    const tarball = join(temporaryDirectory, pack.filename);
+    execFileSync('npm', ['install', '--ignore-scripts', '--prefix', installPrefix, tarball], {
+      stdio: 'inherit'
+    });
+
+    const binary = join(installPrefix, 'node_modules', '.bin', 'policydiff');
+    const version = execFileSync(binary, ['--version'], { encoding: 'utf8' }).trim();
+    if (version !== packageJson.version) {
+      throw new Error(`Packed binary reported version ${version}; expected ${packageJson.version}.`);
+    }
+
+    const help = execFileSync(binary, ['--help'], { encoding: 'utf8' });
+    if (!help.includes('compare') || !help.includes('explain')) {
+      throw new Error('Packed binary help is missing the expected commands.');
+    }
+
+    console.log(
+      `Verified ${requiredPaths.length} release files and policydiff ${version} in ${pack.filename}.`
+    );
   }
-  process.exit(1);
+} finally {
+  rmSync(temporaryDirectory, { recursive: true, force: true });
 }
-
-console.log(`Verified ${requiredPaths.length} required release files in ${pack.filename}.`);
