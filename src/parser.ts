@@ -27,7 +27,13 @@ function assertJsonValue(value: unknown, file: string): asserts value is JsonVal
 export async function parsePolicyFile(path: string): Promise<JsonValue> {
   const raw = await readFile(path, 'utf8');
   const ext = extname(path).toLowerCase();
-  const parsed = ext === '.json' ? JSON.parse(raw) : yaml.load(raw, { json: true });
+  let parsed: unknown;
+  try {
+    parsed = ext === '.json' ? JSON.parse(raw) : yaml.load(raw);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${path}: ${message}`, { cause: error });
+  }
   const value = parsed === undefined ? null : parsed;
   assertJsonValue(value, path);
   return normalize(value);
