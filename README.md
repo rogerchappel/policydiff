@@ -113,6 +113,11 @@ order-sensitive.
 
 `policydiff` is not a formal verifier. It is a practical reviewer assistant that highlights likely-risky config diffs.
 
+YAML input must use unique mapping keys at every nesting level. Duplicate keys
+are rejected as parsing errors instead of silently keeping one value; the CLI
+identifies the affected file and exits with status `1`. JSON parsing retains
+the runtime's standard `JSON.parse` behavior.
+
 ## Verification
 
 ```bash
