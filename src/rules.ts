@@ -7,6 +7,12 @@ export function maxSeverity(a: Severity, b: Severity): Severity { return severit
 
 function text(value: JsonValue | undefined): string { return String(value ?? '').toLowerCase(); }
 function pathHas(change: DiffChange, pattern: RegExp): boolean { return pattern.test(change.path.toLowerCase()); }
+function decodedPathSegments(path: string): string[] {
+  return path.split('/').slice(1).map((segment) => segment.replace(/~1/g, '/').replace(/~0/g, '~').toLowerCase());
+}
+function pathHasSegment(change: DiffChange, names: readonly string[]): boolean {
+  return decodedPathSegments(change.path).some((segment) => names.includes(segment));
+}
 function becameTruthy(change: DiffChange): boolean { return change.kind === 'changed' && change.before === false && change.after === true; }
 function becameFalsy(change: DiffChange): boolean { return change.kind === 'changed' && change.before === true && change.after === false; }
 function widenedWord(before: JsonValue | undefined, after: JsonValue | undefined): boolean {
@@ -17,8 +23,8 @@ function widenedWord(before: JsonValue | undefined, after: JsonValue | undefined
 }
 
 const classifiers: Classifier[] = [
-  (c) => pathHas(c, /permissions|scopes|allow|allowed|tools|capabilities|roles/) && (c.kind === 'added' || widenedWord(c.before, c.after)) ? { severity: 'high', category: 'permission', ruleId: 'permission.widened', message: 'Permission, role, scope, or allowlist widened.' } : undefined,
-  (c) => pathHas(c, /permissions|scopes|allow|allowed|tools|capabilities|roles/) && c.kind === 'removed' ? { severity: 'medium', category: 'permission', ruleId: 'permission.removed', message: 'Permission-related entry removed; confirm this is intentional.' } : undefined,
+  (c) => pathHasSegment(c, ['permissions', 'scopes', 'allow', 'allowed', 'tools', 'capabilities', 'roles']) && (c.kind === 'added' || widenedWord(c.before, c.after)) ? { severity: 'high', category: 'permission', ruleId: 'permission.widened', message: 'Permission, role, scope, or allowlist widened.' } : undefined,
+  (c) => pathHasSegment(c, ['permissions', 'scopes', 'allow', 'allowed', 'tools', 'capabilities', 'roles']) && c.kind === 'removed' ? { severity: 'medium', category: 'permission', ruleId: 'permission.removed', message: 'Permission-related entry removed; confirm this is intentional.' } : undefined,
   (c) => pathHas(c, /required.*review|approv|protected|enforce|guard|deny|block|required/) && (c.kind === 'removed' || becameFalsy(c)) ? { severity: 'critical', category: 'guardrail', ruleId: 'guardrail.removed', message: 'Review, enforcement, or guardrail appears removed or disabled.' } : undefined,
   (c) => pathHas(c, /required.*review|approv|protected|enforce|guard/) && (c.kind === 'added' || becameTruthy(c)) ? { severity: 'low', category: 'guardrail', ruleId: 'guardrail.added', message: 'Guardrail appears added or enabled.' } : undefined,
   (c) => pathHas(c, /github|workflow|actions|contents|pull-requests/) && widenedWord(c.before, c.after) ? { severity: 'high', category: 'github-actions', ruleId: 'github.permission.write', message: 'GitHub Actions permission was widened.' } : undefined,
