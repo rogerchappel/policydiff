@@ -104,6 +104,11 @@ changes. This lets the same path-based rules classify their settings—for
 example, an added workflow containing `permissions.contents: write` is reported
 at `/permissions/contents` as a high-severity GitHub Actions permission change.
 
+When both compare inputs are standalone files, they form one logical
+before/after pair even when their basenames differ. The report's file `path`
+uses the after file's basename. Directory inputs continue to pair files by
+their relative paths.
+
 Scalar arrays below `permissions`, `scopes`, `allow`, `allowed`, `tools`,
 `capabilities`, or `roles` paths are compared as unordered multisets. Reordering
 the same entries therefore produces no change, while additions and removals

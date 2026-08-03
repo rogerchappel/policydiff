@@ -18,3 +18,23 @@ test('compare reports duplicate YAML keys as a file-specific CLI error', async (
   assert.match(result.stderr, new RegExp(`^policydiff: ${before}:`));
   assert.match(result.stderr, /duplicated mapping key/i);
 });
+
+test('compare CLI treats differently named standalone files as one before/after pair', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-'));
+  const before = join(directory, 'policy.before.json');
+  const after = join(directory, 'policy.after.json');
+  await writeFile(before, '{"permissions":{"contents":"read"}}\n');
+  await writeFile(after, '{"permissions":{"contents":"write"}}\n');
+
+  const result = spawnSync(process.execPath, ['dist/src/cli.js', 'compare', before, after, '--format', 'json'], { encoding: 'utf8' });
+  const report = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0);
+  assert.equal(report.summary.filesCompared, 1);
+  assert.equal(report.files.length, 1);
+  assert.equal(report.files[0].path, 'policy.after.json');
+  assert.deepEqual(
+    report.files[0].changes.map(({ path, kind, before: oldValue, after: newValue }: { path: string; kind: string; before: unknown; after: unknown }) => ({ path, kind, before: oldValue, after: newValue })),
+    [{ path: '/permissions/contents', kind: 'changed', before: 'read', after: 'write' }],
+  );
+});
