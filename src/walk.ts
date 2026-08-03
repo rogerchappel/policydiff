@@ -24,6 +24,10 @@ async function listFiles(root: string): Promise<Map<string, string>> {
 }
 
 export async function pairInputs(before: string, after: string): Promise<FilePair[]> {
+  const [beforeStat, afterStat] = await Promise.all([stat(before), stat(after)]);
+  if (beforeStat.isFile() && afterStat.isFile()) {
+    return [{ relativePath: basename(after), beforePath: before, afterPath: after }];
+  }
   const [left, right] = await Promise.all([listFiles(before), listFiles(after)]);
   const keys = [...new Set([...left.keys(), ...right.keys()])].sort();
   return keys.map((relativePath) => ({ relativePath, beforePath: left.get(relativePath), afterPath: right.get(relativePath) }));
