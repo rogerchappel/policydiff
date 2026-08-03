@@ -28,3 +28,21 @@ test('classifies semantic allowlist additions and removals by risk', () => {
     ],
   );
 });
+
+test('matches permission rules on complete decoded path segments', () => {
+  for (const path of ['/roles', '/tools/allow']) {
+    const change = classifyChange({ path, kind: 'added', after: 'write', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+    assert.equal(change.ruleId, 'permission.widened', path);
+  }
+
+  const githubPermission = classifyChange({ path: '/permissions/contents', kind: 'added', after: 'write', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+  assert.equal(githubPermission.ruleId, 'github.permission.write');
+});
+
+test('does not classify permission-like key substrings as permissions', () => {
+  for (const path of ['/rolesDescription', '/disallowedReason', '/toolset', '/capabilitiesSummary', '/roles~1description']) {
+    const change = classifyChange({ path, kind: 'added', after: 'write', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+    assert.equal(change.ruleId, 'generic.change', path);
+    assert.equal(change.severity, 'low', path);
+  }
+});
