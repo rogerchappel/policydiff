@@ -6,12 +6,14 @@ export const severities = Object.keys(severityRank) as Severity[];
 export function maxSeverity(a: Severity, b: Severity): Severity { return severityRank[a] >= severityRank[b] ? a : b; }
 
 function text(value: JsonValue | undefined): string { return String(value ?? '').toLowerCase(); }
-function pathHas(change: DiffChange, pattern: RegExp): boolean { return pattern.test(change.path.toLowerCase()); }
 function decodedPathSegments(path: string): string[] {
   return path.split('/').slice(1).map((segment) => segment.replace(/~1/g, '/').replace(/~0/g, '~').toLowerCase());
 }
 function pathHasSegment(change: DiffChange, names: readonly string[]): boolean {
   return decodedPathSegments(change.path).some((segment) => names.includes(segment));
+}
+function pathHasMatchingSegment(change: DiffChange, names: readonly string[], patterns: readonly RegExp[] = []): boolean {
+  return decodedPathSegments(change.path).some((segment) => names.includes(segment) || patterns.some((pattern) => pattern.test(segment)));
 }
 function becameTruthy(change: DiffChange): boolean { return change.kind === 'changed' && change.before === false && change.after === true; }
 function becameFalsy(change: DiffChange): boolean { return change.kind === 'changed' && change.before === true && change.after === false; }
@@ -25,12 +27,12 @@ function widenedWord(before: JsonValue | undefined, after: JsonValue | undefined
 const classifiers: Classifier[] = [
   (c) => pathHasSegment(c, ['permissions', 'scopes', 'allow', 'allowed', 'tools', 'capabilities', 'roles']) && (c.kind === 'added' || widenedWord(c.before, c.after)) ? { severity: 'high', category: 'permission', ruleId: 'permission.widened', message: 'Permission, role, scope, or allowlist widened.' } : undefined,
   (c) => pathHasSegment(c, ['permissions', 'scopes', 'allow', 'allowed', 'tools', 'capabilities', 'roles']) && c.kind === 'removed' ? { severity: 'medium', category: 'permission', ruleId: 'permission.removed', message: 'Permission-related entry removed; confirm this is intentional.' } : undefined,
-  (c) => pathHas(c, /required.*review|approv|protected|enforce|guard|deny|block|required/) && (c.kind === 'removed' || becameFalsy(c)) ? { severity: 'critical', category: 'guardrail', ruleId: 'guardrail.removed', message: 'Review, enforcement, or guardrail appears removed or disabled.' } : undefined,
-  (c) => pathHas(c, /required.*review|approv|protected|enforce|guard/) && (c.kind === 'added' || becameTruthy(c)) ? { severity: 'low', category: 'guardrail', ruleId: 'guardrail.added', message: 'Guardrail appears added or enabled.' } : undefined,
-  (c) => pathHas(c, /github|workflow|actions|contents|pull-requests/) && widenedWord(c.before, c.after) ? { severity: 'high', category: 'github-actions', ruleId: 'github.permission.write', message: 'GitHub Actions permission was widened.' } : undefined,
-  (c) => pathHas(c, /scripts|preinstall|postinstall|prepare/) && c.kind !== 'removed' ? { severity: 'high', category: 'package-scripts', ruleId: 'script.execution.changed', message: 'Package lifecycle or executable script changed.' } : undefined,
-  (c) => pathHas(c, /cors|origin|hosts/) && (text(c.after).includes('*') || c.kind === 'added') ? { severity: 'medium', category: 'network', ruleId: 'network.exposure.changed', message: 'Network exposure or CORS setting changed.' } : undefined,
-  (c) => pathHas(c, /secret|token|password|private/) ? { severity: 'medium', category: 'secret-handling', ruleId: 'secret.path.changed', message: 'Secret-adjacent configuration changed; avoid committing sensitive values.' } : undefined,
+  (c) => pathHasMatchingSegment(c, ['approval', 'approvals', 'protected', 'protection', 'enforce', 'enforcement', 'guard', 'guardrail', 'guardrails', 'deny', 'denied', 'block', 'blocked', 'required'], [/^(?:require|required)[_-]?(?:approval|approvals|review|reviews)$/, /^branch[_-]?(?:protected|protection)$/]) && (c.kind === 'removed' || becameFalsy(c)) ? { severity: 'critical', category: 'guardrail', ruleId: 'guardrail.removed', message: 'Review, enforcement, or guardrail appears removed or disabled.' } : undefined,
+  (c) => pathHasMatchingSegment(c, ['approval', 'approvals', 'protected', 'protection', 'enforce', 'enforcement', 'guard', 'guardrail', 'guardrails'], [/^(?:require|required)[_-]?(?:approval|approvals|review|reviews)$/, /^branch[_-]?(?:protected|protection)$/]) && (c.kind === 'added' || becameTruthy(c)) ? { severity: 'low', category: 'guardrail', ruleId: 'guardrail.added', message: 'Guardrail appears added or enabled.' } : undefined,
+  (c) => pathHasMatchingSegment(c, ['github', 'workflow', 'workflows', 'actions', 'contents', 'pull-requests'], [/^github[_-]?(?:actions|workflow|workflows)$/]) && widenedWord(c.before, c.after) ? { severity: 'high', category: 'github-actions', ruleId: 'github.permission.write', message: 'GitHub Actions permission was widened.' } : undefined,
+  (c) => pathHasSegment(c, ['script', 'scripts', 'preinstall', 'postinstall', 'prepare']) && c.kind !== 'removed' ? { severity: 'high', category: 'package-scripts', ruleId: 'script.execution.changed', message: 'Package lifecycle or executable script changed.' } : undefined,
+  (c) => pathHasSegment(c, ['cors', 'origin', 'origins', 'host', 'hosts']) && (text(c.after).includes('*') || c.kind === 'added') ? { severity: 'medium', category: 'network', ruleId: 'network.exposure.changed', message: 'Network exposure or CORS setting changed.' } : undefined,
+  (c) => pathHasMatchingSegment(c, ['secret', 'secrets', 'token', 'tokens', 'password', 'passwords', 'private'], [/^(?:api|access|auth|client|refresh)[_-]?(?:secret|token)$/, /^private[_-]?key$/, /^(?:secret|token|password)[_-]?(?:key|value|name)$/]) ? { severity: 'medium', category: 'secret-handling', ruleId: 'secret.path.changed', message: 'Secret-adjacent configuration changed; avoid committing sensitive values.' } : undefined,
 ];
 
 export function classifyChange(change: DiffChange): DiffChange {

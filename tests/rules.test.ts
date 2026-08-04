@@ -46,3 +46,24 @@ test('does not classify permission-like key substrings as permissions', () => {
     assert.equal(change.severity, 'low', path);
   }
 });
+
+test('matches intentional path segments and documented compound keys', () => {
+  const cases = [
+    { path: '/requireApproval', kind: 'removed' as const, before: true, ruleId: 'guardrail.removed' },
+    { path: '/githubWorkflow', kind: 'changed' as const, before: 'read', after: 'write', ruleId: 'github.permission.write' },
+    { path: '/scripts/build', kind: 'changed' as const, before: 'old', after: 'new', ruleId: 'script.execution.changed' },
+    { path: '/clientSecret', kind: 'changed' as const, before: 'old', after: 'new', ruleId: 'secret.path.changed' },
+  ];
+
+  for (const { ruleId, ...change } of cases) {
+    assert.equal(classifyChange({ ...change, severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' }).ruleId, ruleId, change.path);
+  }
+});
+
+test('does not classify unrelated path segment substrings', () => {
+  for (const path of ['/notrequired', '/privateer', '/workflowsDescription', '/transcripts', '/origination', '/blockchain']) {
+    const change = classifyChange({ path, kind: 'added', after: 'write', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+    assert.equal(change.ruleId, 'generic.change', path);
+    assert.equal(change.severity, 'low', path);
+  }
+});
