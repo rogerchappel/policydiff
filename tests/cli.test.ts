@@ -38,3 +38,23 @@ test('compare CLI treats differently named standalone files as one before/after 
     [{ path: '/permissions/contents', kind: 'changed', before: 'read', after: 'write' }],
   );
 });
+
+test('compare CLI distinguishes classifier names from substring collisions', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-'));
+  const before = join(directory, 'before.json');
+  const after = join(directory, 'after.json');
+  await writeFile(before, JSON.stringify({ notrequired: true, privateer: 'old', requireApproval: true, accessToken: 'old' }));
+  await writeFile(after, JSON.stringify({ notrequired: false, privateer: 'new', requireApproval: false, accessToken: 'new' }));
+
+  const result = spawnSync(process.execPath, ['dist/src/cli.js', 'compare', before, after, '--format', 'json'], { encoding: 'utf8' });
+  const report = JSON.parse(result.stdout);
+  const rules = Object.fromEntries(report.files[0].changes.map(({ path, ruleId }: { path: string; ruleId: string }) => [path, ruleId]));
+
+  assert.equal(result.status, 2);
+  assert.deepEqual(rules, {
+    '/accessToken': 'secret.path.changed',
+    '/notrequired': 'generic.change',
+    '/privateer': 'generic.change',
+    '/requireApproval': 'guardrail.removed',
+  });
+});
