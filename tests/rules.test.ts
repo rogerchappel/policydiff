@@ -14,6 +14,18 @@ test('classifies disabled approvals as critical guardrail removal', () => {
   assert.equal(change.severity, 'critical');
 });
 
+test('classifies added boolean guardrails by their effective value', () => {
+  for (const path of ['/requireApproval', '/enforcement', '/branchProtection']) {
+    const disabled = classifyChange({ path, kind: 'added', after: false, severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+    assert.equal(disabled.severity, 'critical', path);
+    assert.equal(disabled.ruleId, 'guardrail.removed', path);
+
+    const enabled = classifyChange({ path, kind: 'added', after: true, severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+    assert.equal(enabled.severity, 'low', path);
+    assert.equal(enabled.ruleId, 'guardrail.added', path);
+  }
+});
+
 test('classifies semantic allowlist additions and removals by risk', () => {
   const changes = diffValues(
     { tools: { allow: ['read', 'write'] } },
