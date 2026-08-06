@@ -53,6 +53,25 @@ test('compareInputs classifies leaves in wholly added and removed policy files',
   assert.equal(report.summary.highestSeverity, 'high');
 });
 
+test('compareInputs treats added false guardrails as disabled and added true guardrails as enabled', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-guardrails-'));
+  const before = join(directory, 'before.json');
+  const after = join(directory, 'after.json');
+  await writeFile(before, '{}\n');
+  await writeFile(after, '{"requireApproval":false,"enforcement":true}\n');
+
+  const report = await compareInputs(before, after);
+
+  assert.deepEqual(
+    report.files[0]?.changes.map(({ path, severity, ruleId }) => ({ path, severity, ruleId })),
+    [
+      { path: '/enforcement', severity: 'low', ruleId: 'guardrail.added' },
+      { path: '/requireApproval', severity: 'critical', ruleId: 'guardrail.removed' },
+    ],
+  );
+  assert.equal(report.summary.highestSeverity, 'critical');
+});
+
 for (const [beforeName, afterName] of [
   ['policy.json', 'policy.json'],
   ['policy.before.json', 'policy.after.yml'],

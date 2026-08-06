@@ -19,4 +19,9 @@ Selected compound keys are matched with anchored patterns: examples include
 `privateKey`. Unrelated substrings such as `notrequired` and `privateer` are not
 classified.
 
+Boolean guardrail additions are classified by their effective value. Adding a
+supported guardrail key with `false` is treated as removed or disabled
+(`guardrail.removed`, critical), while adding it with `true` is treated as added
+or enabled (`guardrail.added`, low).
+
 These are review prompts, not proof of vulnerability. Prefer safe defaults and add targeted tests when introducing new heuristics.
