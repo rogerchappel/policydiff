@@ -11,6 +11,15 @@ test('parsePolicyFile loads YAML fixtures', async () => {
   assert.match(JSON.stringify(value), /permissions/);
 });
 
+test('parsePolicyFile preserves unquoted YAML timestamps as strings', async () => {
+  const path = await temporaryPolicy('timestamps.yml', 'expires: 2026-08-06\ncreated: 2026-08-06T12:35:00Z\n');
+
+  assert.deepEqual(await parsePolicyFile(path), {
+    created: '2026-08-06T12:35:00Z',
+    expires: '2026-08-06',
+  });
+});
+
 async function temporaryPolicy(name: string, contents: string): Promise<string> {
   const directory = await mkdtemp(join(tmpdir(), 'policydiff-parser-'));
   const path = join(directory, name);

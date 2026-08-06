@@ -72,6 +72,26 @@ test('compareInputs treats added false guardrails as disabled and added true gua
   assert.equal(report.summary.highestSeverity, 'critical');
 });
 
+test('compareInputs reports changed unquoted YAML dates and ignores equal dates', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-dates-'));
+  const before = join(directory, 'before.yml');
+  const changed = join(directory, 'changed.yml');
+  const equal = join(directory, 'equal.yml');
+  await writeFile(before, 'expires: 2026-08-06\n');
+  await writeFile(changed, 'expires: 2026-08-07\n');
+  await writeFile(equal, 'expires: 2026-08-06\n');
+
+  const changedReport = await compareInputs(before, changed);
+  const equalReport = await compareInputs(before, equal);
+
+  assert.deepEqual(
+    changedReport.files[0]?.changes.map(({ path, kind, before: oldValue, after: newValue }) => ({ path, kind, before: oldValue, after: newValue })),
+    [{ path: '/expires', kind: 'changed', before: '2026-08-06', after: '2026-08-07' }],
+  );
+  assert.equal(changedReport.summary.changes, 1);
+  assert.equal(equalReport.summary.changes, 0);
+});
+
 for (const [beforeName, afterName] of [
   ['policy.json', 'policy.json'],
   ['policy.before.json', 'policy.after.yml'],
