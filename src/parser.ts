@@ -29,7 +29,7 @@ export async function parsePolicyFile(path: string): Promise<JsonValue> {
   const ext = extname(path).toLowerCase();
   let parsed: unknown;
   try {
-    parsed = ext === '.json' ? JSON.parse(raw) : yaml.load(raw);
+    parsed = ext === '.json' ? JSON.parse(raw) : yaml.load(raw, { schema: yaml.JSON_SCHEMA });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(`${path}: ${message}`, { cause: error });
