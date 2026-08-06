@@ -39,6 +39,32 @@ test('compare CLI treats differently named standalone files as one before/after 
   );
 });
 
+test('compare CLI reports changes between unquoted YAML dates', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-dates-'));
+  const before = join(directory, 'before.yml');
+  const after = join(directory, 'after.yml');
+  await writeFile(before, 'expires: 2026-08-06\n');
+  await writeFile(after, 'expires: 2026-08-07\n');
+
+  const result = spawnSync(process.execPath, ['dist/src/cli.js', 'compare', before, after, '--format', 'json'], { encoding: 'utf8' });
+  const report = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0);
+  assert.deepEqual(report.files[0].changes, [
+    {
+      path: '/expires',
+      kind: 'changed',
+      before: '2026-08-06',
+      after: '2026-08-07',
+      severity: 'low',
+      category: 'generic',
+      ruleId: 'generic.change',
+      message: 'changed value at /expires',
+    },
+  ]);
+  assert.equal(report.summary.changes, 1);
+});
+
 test('compare CLI distinguishes classifier names from substring collisions', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-'));
   const before = join(directory, 'before.json');
