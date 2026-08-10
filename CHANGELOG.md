@@ -17,7 +17,7 @@ format and uses semantic versioning when versioned releases are published.
   instead of reporting a single generic root change.
 - Compare scalar permission and allowlist arrays semantically so reordering
   entries does not produce false permission-widening findings.
-- Update `js-yaml` to 4.3.0 to address upstream parser vulnerabilities.
+- Update `js-yaml` to 4.3.1 to address upstream parser vulnerabilities.
 
 ## Release Links
 
