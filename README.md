@@ -4,12 +4,24 @@
 
 ## Install
 
+The npm package name is reserved for this project but is not currently
+published. Install the CLI from source:
+
 ```bash
-npm install -g @rogerchappel/policydiff
+git clone https://github.com/rogerchappel/policydiff.git
+cd policydiff
+npm ci
+npm run build
+npm link
 policydiff --version
 ```
 
-For local development:
+Tagged builds are distributed as `.tgz` artifacts on
+[GitHub Releases](https://github.com/rogerchappel/policydiff/releases), as
+defined by the release workflow. After downloading an artifact, install it
+with `npm install --global ./rogerchappel-policydiff-<version>.tgz`.
+
+For local development without linking the command globally:
 
 ```bash
 npm install
@@ -22,9 +34,7 @@ node dist/src/cli.js --help
 Run the checked-in policy fixture comparison and print the reviewer summary:
 
 ```bash
-npm install
-npm run build
-node dist/src/cli.js compare fixtures/before fixtures/after --format text
+policydiff compare fixtures/before fixtures/after --format text
 ```
 
 For a release-style smoke, write JSON evidence and render the explanation:
@@ -168,7 +178,8 @@ npm run package:smoke
 npm run release:check
 ```
 
-The package identity check verifies that the npm name is either unclaimed or
-already points at this repository. The package smoke installs the generated
-tarball into a temporary prefix and runs its `policydiff` binary and version,
-without publishing.
+The package identity check verifies that the reserved npm name remains
+unclaimed or already points at this repository; the release workflow does not
+publish to npm. It attaches the generated tarball to a GitHub Release instead.
+The package smoke installs that generated tarball into a temporary prefix and
+runs its `policydiff` binary and version without publishing.

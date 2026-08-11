@@ -34,8 +34,9 @@
     "test": "npm run build && node --test dist/**/*.test.js",
     "smoke": "npm run build && node dist/src/cli.js compare fixtures/before fixtures/after --format text; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/src/cli.js compare fixtures/before fixtures/after --format json --output /tmp/policydiff-smoke.json; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/src/cli.js explain /tmp/policydiff-smoke.json --format markdown",
     "package:identity": "node scripts/check-package-identity.mjs",
+    "docs:check": "node scripts/check-readme-install.mjs",
     "package:smoke": "npm run build && node scripts/package-smoke.mjs",
-    "release:check": "npm run package:identity && npm run check && npm test && npm run smoke && npm run package:smoke"
+    "release:check": "npm run package:identity && npm run docs:check && npm run check && npm test && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "policy",
