@@ -134,7 +134,10 @@ identifies the affected file and exits with status `1`. JSON parsing retains
 the runtime's standard `JSON.parse` behavior. YAML uses `js-yaml`'s JSON schema:
 JSON-compatible booleans, nulls, and numbers are parsed as scalar values, while
 timestamp-looking values such as `2026-08-06` remain deterministic strings
-instead of becoming JavaScript `Date` objects.
+instead of becoming JavaScript `Date` objects. YAML anchors and aliases may
+reuse non-cyclic mappings or sequences. Each alias is expanded into an
+independent, deterministically normalized JSON-compatible value; aliases that
+form a cycle are rejected as parsing errors.
 
 ## Verification
 
