@@ -19,6 +19,51 @@ test('compare reports duplicate YAML keys as a file-specific CLI error', async (
   assert.match(result.stderr, /duplicated mapping key/i);
 });
 
+test('compare CLI accepts repeated mapping aliases', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-aliases-'));
+  const before = join(directory, 'before.yml');
+  const after = join(directory, 'after.yml');
+  await writeFile(before, 'defaults: &defaults\n  contents: read\nfirst: *defaults\nsecond: *defaults\n');
+  await writeFile(after, 'defaults: &defaults\n  contents: write\nfirst: *defaults\nsecond: *defaults\n');
+
+  const result = spawnSync(process.execPath, ['dist/src/cli.js', 'compare', before, after, '--format', 'json'], { encoding: 'utf8' });
+  const report = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0);
+  assert.deepEqual(report.files[0].changes.map(({ path }: { path: string }) => path), [
+    '/defaults/contents',
+    '/first/contents',
+    '/second/contents',
+  ]);
+});
+
+test('compare CLI accepts repeated sequence aliases', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-aliases-'));
+  const before = join(directory, 'before.yml');
+  const after = join(directory, 'after.yml');
+  await writeFile(before, 'roles: &roles\n  - reader\nprimary: *roles\nbackup: *roles\n');
+  await writeFile(after, 'roles: &roles\n  - reader\n  - auditor\nprimary: *roles\nbackup: *roles\n');
+
+  const result = spawnSync(process.execPath, ['dist/src/cli.js', 'compare', before, after, '--format', 'json'], { encoding: 'utf8' });
+  const report = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0);
+  assert.deepEqual(report.files[0].changes.map(({ path }: { path: string }) => path), ['/backup/1', '/primary/1', '/roles/0']);
+});
+
+test('compare CLI reports cyclic aliases as a file-specific error', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-aliases-'));
+  const before = join(directory, 'before.yml');
+  const after = join(directory, 'after.yml');
+  await writeFile(before, 'loop: &loop\n  - *loop\n');
+  await writeFile(after, 'loop: []\n');
+
+  const result = spawnSync(process.execPath, ['dist/src/cli.js', 'compare', before, after], { encoding: 'utf8' });
+
+  assert.equal(result.status, 1);
+  assert.equal(result.stderr, `policydiff: ${before}: circular value at $.loop[0]\n`);
+});
+
 test('compare CLI treats differently named standalone files as one before/after pair', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-'));
   const before = join(directory, 'policy.before.json');
