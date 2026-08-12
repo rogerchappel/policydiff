@@ -9,14 +9,18 @@ export function isSupportedPolicyFile(path: string): boolean {
 }
 
 function assertJsonValue(value: unknown, file: string): asserts value is JsonValue {
-  const seen = new Set<unknown>();
+  const active = new Set<object>();
   const visit = (item: unknown, where: string): void => {
     if (item === null || ['string', 'number', 'boolean'].includes(typeof item)) return;
-    if (Array.isArray(item)) return item.forEach((child, index) => visit(child, `${where}[${index}]`));
     if (typeof item === 'object') {
-      if (seen.has(item)) throw new Error(`${file}: circular value at ${where}`);
-      seen.add(item);
-      for (const [key, child] of Object.entries(item as Record<string, unknown>)) visit(child, `${where}.${key}`);
+      if (active.has(item)) throw new Error(`${file}: circular value at ${where}`);
+      active.add(item);
+      if (Array.isArray(item)) {
+        item.forEach((child, index) => visit(child, `${where}[${index}]`));
+      } else {
+        for (const [key, child] of Object.entries(item as Record<string, unknown>)) visit(child, `${where}.${key}`);
+      }
+      active.delete(item);
       return;
     }
     throw new Error(`${file}: unsupported ${typeof item} at ${where}`);
