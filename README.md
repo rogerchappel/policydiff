@@ -46,6 +46,11 @@ node dist/src/cli.js explain /tmp/policydiff-smoke.json --format markdown
 
 ## Compare files or directories
 
+Standalone inputs must use a `.json`, `.yaml`, or `.yml` extension. Directory
+comparisons recursively include those extensions and ignore other files; a
+comparison with no supported files exits with an error instead of producing an
+empty report.
+
 ```bash
 policydiff compare fixtures/before fixtures/after
 policydiff compare policy.before.yml policy.after.yml --format markdown

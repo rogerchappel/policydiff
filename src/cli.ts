@@ -9,8 +9,8 @@ program.name('policydiff').description('Explain risky JSON/YAML policy and confi
 
 program.command('compare')
   .description('Compare JSON/YAML files or directories')
-  .argument('<before>', 'before file or directory')
-  .argument('<after>', 'after file or directory')
+  .argument('<before>', 'before .json, .yaml, or .yml file, or directory')
+  .argument('<after>', 'after .json, .yaml, or .yml file, or directory')
   .option('-f, --format <format>', 'text, markdown, or json', 'text')
   .option('-o, --output <path>', 'write report to a file')
   .action(async (before: string, after: string, options: { format: string; output?: string }) => {
