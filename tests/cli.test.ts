@@ -5,6 +5,19 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 
+test('compare CLI rejects unsupported standalone files with the affected path', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-'));
+  const before = join(directory, 'before.txt');
+  const after = join(directory, 'after.txt');
+  await Promise.all([writeFile(before, 'before\n'), writeFile(after, 'after\n')]);
+
+  const result = spawnSync(process.execPath, ['dist/src/cli.js', 'compare', before, after], { encoding: 'utf8' });
+
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, '');
+  assert.equal(result.stderr, `policydiff: Unsupported policy file: ${before}; expected .json, .yaml, or .yml\n`);
+});
+
 test('compare reports duplicate YAML keys as a file-specific CLI error', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-'));
   const before = join(directory, 'before.yml');
