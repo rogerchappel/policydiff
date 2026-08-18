@@ -44,6 +44,9 @@ node dist/src/cli.js compare fixtures/before fixtures/after --format json --outp
 node dist/src/cli.js explain /tmp/policydiff-smoke.json --format markdown
 ```
 
+`explain` validates saved report structure before rendering. Malformed summaries,
+file entries, or changes exit with status 1 and identify the invalid report field.
+
 ## Compare files or directories
 
 Standalone inputs must use a `.json`, `.yaml`, or `.yml` extension. Directory
