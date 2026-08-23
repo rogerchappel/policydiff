@@ -8,6 +8,8 @@ on:
       - package.json
       - package-lock.json
       - .github/workflows/release*.yml
+      - scripts/prepare-release-artifact.mjs
+      - scripts/release-contract.test.mjs
 
 permissions:
   contents: read
@@ -39,6 +41,8 @@ jobs:
         run: node /tmp/releasebox/bin/releasebox.js check .
       - name: Run release checks
         run: npm run release:check
+      - name: Validate release artifact contract
+        run: node scripts/prepare-release-artifact.mjs "v$(node -p "require('./package.json').version")"
       - name: Release notes preview
         run: |
           node /tmp/releasebox/bin/releasebox.js notes . > release-notes-preview.md
