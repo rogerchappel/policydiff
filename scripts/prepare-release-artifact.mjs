@@ -4,7 +4,9 @@ import { appendFileSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
-const tag = process.env.GITHUB_REF_NAME ?? process.argv[2];
+// Pull-request dry runs execute at refs/pull/<number>/merge, so an explicit
+// validation tag supplied by the workflow must take precedence over that ref.
+const tag = process.argv[2] ?? process.env.GITHUB_REF_NAME;
 const expectedTag = `v${packageJson.version}`;
 
 if (tag !== expectedTag) {

@@ -10,6 +10,7 @@ test('release validates the tag before creating any release side effect', () => 
   const release = workflow.indexOf('gh release create');
   assert.ok(prepare >= 0 && release > prepare);
   assert.match(workflow, /node scripts\/prepare-release-artifact\.mjs/);
+  assert.match(preparer, /process\.argv\[2\] \?\? process\.env\.GITHUB_REF_NAME/);
   assert.match(preparer, /tag !== expectedTag/);
 });
 
