@@ -36,7 +36,8 @@
     "package:identity": "node scripts/check-package-identity.mjs",
     "docs:check": "node scripts/check-readme-install.mjs",
     "package:smoke": "npm run build && node scripts/package-smoke.mjs",
-    "release:check": "npm run package:identity && npm run docs:check && npm run check && npm test && npm run smoke && npm run package:smoke"
+    "release:contract": "node --test scripts/release-contract.test.mjs",
+    "release:check": "npm run package:identity && npm run docs:check && npm run release:contract && npm run check && npm test && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "policy",

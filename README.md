@@ -186,6 +186,7 @@ npm test
 npm run build
 npm run smoke
 npm run package:smoke
+npm run release:contract
 npm run release:check
 ```
 
@@ -194,3 +195,10 @@ unclaimed or already points at this repository; the release workflow does not
 publish to npm. It attaches the generated tarball to a GitHub Release instead.
 The package smoke installs that generated tarball into a temporary prefix and
 runs its `policydiff` binary and version without publishing.
+
+Before packaging, the release workflow requires the pushed tag to equal
+`v<package.json version>`. It parses `npm pack --json`, requires exactly one
+tarball with the expected scoped-package filename and version, and passes that
+validated path to GitHub Releases. A mismatched tag or unexpected artifact
+stops the workflow before release creation; correct the tag or package version,
+remove any bad tag if necessary, and rerun with the matching tag.
