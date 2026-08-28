@@ -19,6 +19,11 @@ format and uses semantic versioning when versioned releases are published.
   entries does not produce false permission-widening findings.
 - Update `js-yaml` to 4.3.1 to address upstream parser vulnerabilities.
 
+### Changed
+
+- Refresh `js-yaml` and the Node.js type definitions to their latest compatible
+  releases.
+
 ## Release Links
 
 - Unreleased:
