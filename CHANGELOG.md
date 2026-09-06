@@ -13,6 +13,8 @@ format and uses semantic versioning when versioned releases are published.
 
 ### Fixed
 
+- Require `contents` and `pull-requests` write widening to occur directly under
+  a `permissions` map before classifying it as a GitHub Actions permission.
 - Classify meaningful leaf changes in wholly added or removed JSON/YAML files
   instead of reporting a single generic root change.
 - Compare scalar permission and allowlist arrays semantically so reordering

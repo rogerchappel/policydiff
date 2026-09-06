@@ -113,7 +113,9 @@ hooks live in
 - Generic JSON/YAML additions, removals, and changes.
 - Permission, scope, role, allowlist, and tool access widening.
 - Removed or disabled approvals, enforcement, branch protection, and guardrails.
-- GitHub Actions permission changes such as `contents: read` → `write`.
+- GitHub Actions permission changes such as `permissions.contents: read` →
+  `write`. A similarly named key outside a `permissions` map remains a generic
+  policy change.
 - Package lifecycle or executable script changes.
 - Network exposure/CORS changes and secret-adjacent path changes.
 
