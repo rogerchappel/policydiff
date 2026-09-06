@@ -9,6 +9,22 @@ test('classifies widened permissions as high severity', () => {
   assert.equal(change.ruleId, 'github.permission.write');
 });
 
+test('limits GitHub Actions classification to permissions entries', () => {
+  for (const path of ['/contents', '/repository/contents', '/workflow/name', '/githubWorkflow']) {
+    const change = classifyChange({ path, kind: 'changed', before: 'read', after: 'write', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+    assert.equal(change.ruleId, 'generic.change', path);
+    assert.equal(change.category, 'generic', path);
+    assert.equal(change.severity, 'low', path);
+  }
+
+  for (const path of ['/permissions/contents', '/permissions/pull-requests', '/jobs/release/permissions/contents']) {
+    const change = classifyChange({ path, kind: 'changed', before: 'read', after: 'write', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+    assert.equal(change.ruleId, 'github.permission.write', path);
+    assert.equal(change.category, 'github-actions', path);
+    assert.equal(change.severity, 'high', path);
+  }
+});
+
 test('classifies disabled approvals as critical guardrail removal', () => {
   const change = classifyChange({ path: '/requireApproval', kind: 'changed', before: true, after: false, severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
   assert.equal(change.severity, 'critical');
@@ -62,7 +78,6 @@ test('does not classify permission-like key substrings as permissions', () => {
 test('matches intentional path segments and documented compound keys', () => {
   const cases = [
     { path: '/requireApproval', kind: 'removed' as const, before: true, ruleId: 'guardrail.removed' },
-    { path: '/githubWorkflow', kind: 'changed' as const, before: 'read', after: 'write', ruleId: 'github.permission.write' },
     { path: '/scripts/build', kind: 'changed' as const, before: 'old', after: 'new', ruleId: 'script.execution.changed' },
     { path: '/clientSecret', kind: 'changed' as const, before: 'old', after: 'new', ruleId: 'secret.path.changed' },
   ];
