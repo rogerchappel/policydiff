@@ -5,6 +5,26 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 
+test('compare CLI distinguishes restrictive permission additions from grants', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-permissions-'));
+  const before = join(directory, 'before.yml');
+  const after = join(directory, 'after.yml');
+  await writeFile(before, '{}\n');
+  await writeFile(after, 'permissions:\n  contents: none\n  pull-requests: write\ntools:\n  allow:\n    - inspect\n');
+
+  const result = spawnSync(process.execPath, ['dist/src/cli.js', 'compare', before, after, '--format', 'json'], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const changes = JSON.parse(result.stdout).files[0].changes;
+  assert.deepEqual(
+    changes.map(({ path, severity, ruleId }: { path: string; severity: string; ruleId: string }) => ({ path, severity, ruleId })),
+    [
+      { path: '/permissions/contents', severity: 'low', ruleId: 'generic.change' },
+      { path: '/permissions/pull-requests', severity: 'high', ruleId: 'github.permission.write' },
+      { path: '/tools/allow/0', severity: 'high', ruleId: 'permission.widened' },
+    ],
+  );
+});
+
 test('compare CLI rejects unsupported standalone files with the affected path', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'policydiff-cli-'));
   const before = join(directory, 'before.txt');
