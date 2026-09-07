@@ -114,8 +114,10 @@ hooks live in
 - Permission, scope, role, allowlist, and tool access widening.
 - Removed or disabled approvals, enforcement, branch protection, and guardrails.
 - GitHub Actions permission changes such as `permissions.contents: read` →
-  `write`. A similarly named key outside a `permissions` map remains a generic
-  policy change.
+  `write`. Adding an explicit no-access value such as `permissions.contents:
+  none` remains a low-severity generic change, while added grants and allowlist
+  entries remain high severity. A similarly named key outside a `permissions`
+  map remains a generic policy change.
 - Package lifecycle or executable script changes.
 - Network exposure/CORS changes and secret-adjacent path changes.
 

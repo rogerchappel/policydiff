@@ -9,6 +9,28 @@ test('classifies widened permissions as high severity', () => {
   assert.equal(change.ruleId, 'github.permission.write');
 });
 
+test('does not classify added explicit no-access permissions as widened', () => {
+  for (const path of ['/permissions/contents', '/jobs/test/permissions/issues']) {
+    const change = classifyChange({ path, kind: 'added', after: 'none', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+    assert.equal(change.ruleId, 'generic.change', path);
+    assert.equal(change.severity, 'low', path);
+  }
+});
+
+test('preserves high severity for added grants and allowlist entries', () => {
+  const cases = [
+    { path: '/permissions/contents', after: 'read', ruleId: 'permission.widened' },
+    { path: '/permissions/contents', after: 'write', ruleId: 'github.permission.write' },
+    { path: '/tools/allow/0', after: 'deploy', ruleId: 'permission.widened' },
+  ];
+
+  for (const { ruleId, ...input } of cases) {
+    const change = classifyChange({ ...input, kind: 'added', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });
+    assert.equal(change.ruleId, ruleId, input.path);
+    assert.equal(change.severity, 'high', input.path);
+  }
+});
+
 test('limits GitHub Actions classification to permissions entries', () => {
   for (const path of ['/contents', '/repository/contents', '/workflow/name', '/githubWorkflow']) {
     const change = classifyChange({ path, kind: 'changed', before: 'read', after: 'write', severity: 'info', category: 'generic', message: '', ruleId: 'generic.change' });

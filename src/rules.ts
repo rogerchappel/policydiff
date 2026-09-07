@@ -29,9 +29,12 @@ function widenedWord(before: JsonValue | undefined, after: JsonValue | undefined
   if (['read', 'none', 'restricted'].includes(b) && ['write', 'admin', 'all', '*'].includes(a)) return true;
   return false;
 }
+function addedPermissionWidens(after: JsonValue | undefined): boolean {
+  return text(after).trim() !== 'none';
+}
 
 const classifiers: Classifier[] = [
-  (c) => pathHasSegment(c, ['permissions', 'scopes', 'allow', 'allowed', 'tools', 'capabilities', 'roles']) && (c.kind === 'added' || widenedWord(c.before, c.after)) ? { severity: 'high', category: 'permission', ruleId: 'permission.widened', message: 'Permission, role, scope, or allowlist widened.' } : undefined,
+  (c) => pathHasSegment(c, ['permissions', 'scopes', 'allow', 'allowed', 'tools', 'capabilities', 'roles']) && ((c.kind === 'added' && addedPermissionWidens(c.after)) || widenedWord(c.before, c.after)) ? { severity: 'high', category: 'permission', ruleId: 'permission.widened', message: 'Permission, role, scope, or allowlist widened.' } : undefined,
   (c) => pathHasSegment(c, ['permissions', 'scopes', 'allow', 'allowed', 'tools', 'capabilities', 'roles']) && c.kind === 'removed' ? { severity: 'medium', category: 'permission', ruleId: 'permission.removed', message: 'Permission-related entry removed; confirm this is intentional.' } : undefined,
   (c) => pathHasMatchingSegment(c, ['approval', 'approvals', 'protected', 'protection', 'enforce', 'enforcement', 'guard', 'guardrail', 'guardrails', 'deny', 'denied', 'block', 'blocked', 'required'], [/^(?:require|required)[_-]?(?:approval|approvals|review|reviews)$/, /^branch[_-]?(?:protected|protection)$/]) && (c.kind === 'removed' || becameFalsy(c) || addedFalsy(c)) ? { severity: 'critical', category: 'guardrail', ruleId: 'guardrail.removed', message: 'Review, enforcement, or guardrail appears removed or disabled.' } : undefined,
   (c) => pathHasMatchingSegment(c, ['approval', 'approvals', 'protected', 'protection', 'enforce', 'enforcement', 'guard', 'guardrail', 'guardrails'], [/^(?:require|required)[_-]?(?:approval|approvals|review|reviews)$/, /^branch[_-]?(?:protected|protection)$/]) && ((c.kind === 'added' && c.after !== false) || becameTruthy(c)) ? { severity: 'low', category: 'guardrail', ruleId: 'guardrail.added', message: 'Guardrail appears added or enabled.' } : undefined,
