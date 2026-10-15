@@ -11,6 +11,23 @@ test('parsePolicyFile loads YAML fixtures', async () => {
   assert.match(JSON.stringify(value), /permissions/);
 });
 
+test('parsePolicyFile rejects non-finite YAML numbers with their value path', async () => {
+  for (const [name, scalar] of [['nan', '.nan'], ['positive-infinity', '.inf'], ['negative-infinity', '-.inf']]) {
+    const path = await temporaryPolicy(`${name}.yml`, `settings:\n  retry: ${scalar}\n`);
+
+    await assert.rejects(parsePolicyFile(path), (error: Error) => {
+      assert.equal(error.message, `${path}: non-finite number at $.settings.retry`);
+      return true;
+    });
+  }
+});
+
+test('parsePolicyFile preserves finite YAML numbers', async () => {
+  const path = await temporaryPolicy('finite.yml', 'limits:\n  fraction: 0.25\n  retries: 3\n');
+
+  assert.deepEqual(await parsePolicyFile(path), { limits: { fraction: 0.25, retries: 3 } });
+});
+
 test('parsePolicyFile preserves unquoted YAML timestamps as strings', async () => {
   const path = await temporaryPolicy('timestamps.yml', 'expires: 2026-08-06\ncreated: 2026-08-06T12:35:00Z\n');
 
