@@ -11,7 +11,11 @@ export function isSupportedPolicyFile(path: string): boolean {
 function assertJsonValue(value: unknown, file: string): asserts value is JsonValue {
   const active = new Set<object>();
   const visit = (item: unknown, where: string): void => {
-    if (item === null || ['string', 'number', 'boolean'].includes(typeof item)) return;
+    if (item === null || ['string', 'boolean'].includes(typeof item)) return;
+    if (typeof item === 'number') {
+      if (!Number.isFinite(item)) throw new Error(`${file}: non-finite number at ${where}`);
+      return;
+    }
     if (typeof item === 'object') {
       if (active.has(item)) throw new Error(`${file}: circular value at ${where}`);
       active.add(item);
