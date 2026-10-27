@@ -28,6 +28,15 @@ test('parsePolicyFile preserves finite YAML numbers', async () => {
   assert.deepEqual(await parsePolicyFile(path), { limits: { fraction: 0.25, retries: 3 } });
 });
 
+test('parsePolicyFile rejects empty YAML instead of treating it as null', async () => {
+  const path = await temporaryPolicy('empty.yml', '  \n');
+
+  await assert.rejects(parsePolicyFile(path), (error: Error) => {
+    assert.equal(error.message, `${path}: empty YAML document`);
+    return true;
+  });
+});
+
 test('parsePolicyFile preserves unquoted YAML timestamps as strings', async () => {
   const path = await temporaryPolicy('timestamps.yml', 'expires: 2026-08-06\ncreated: 2026-08-06T12:35:00Z\n');
 
