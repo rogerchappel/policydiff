@@ -140,9 +140,11 @@ order-sensitive.
 
 `policydiff` is not a formal verifier. It is a practical reviewer assistant that highlights likely-risky config diffs.
 
-YAML input must use unique mapping keys at every nesting level. Duplicate keys
-are rejected as parsing errors instead of silently keeping one value; the CLI
-identifies the affected file and exits with status `1`. JSON parsing retains
+YAML input must use unique mapping keys at every nesting level. Empty or
+whitespace-only YAML documents are rejected as parsing errors rather than
+silently interpreted as JSON `null`. Duplicate keys are rejected as parsing
+errors instead of silently keeping one value; the CLI identifies the affected
+file and exits with status `1`. JSON parsing retains
 the runtime's standard `JSON.parse` behavior. YAML uses `js-yaml`'s JSON schema:
 JSON-compatible booleans, nulls, and numbers are parsed as scalar values, while
 timestamp-looking values such as `2026-08-06` remain deterministic strings
