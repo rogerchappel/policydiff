@@ -42,7 +42,8 @@ export async function parsePolicyFile(path: string): Promise<JsonValue> {
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(`${path}: ${message}`, { cause: error });
   }
-  const value = parsed === undefined ? null : parsed;
+  if (parsed === undefined) throw new Error(`${path}: empty YAML document`);
+  const value = parsed;
   assertJsonValue(value, path);
   return normalize(value);
 }
