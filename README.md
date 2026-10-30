@@ -5,7 +5,10 @@
 ## Install
 
 The npm package name is reserved for this project but is not currently
-published. Install the CLI from source:
+published, so `npm install @rogerchappel/policydiff` is not a supported install
+path. To install from source, you need Git, Node.js 20 or newer, npm, and network
+access to GitHub (to clone the repository) and the npm registry (to install the
+locked dependencies). From a clean checkout:
 
 ```bash
 git clone https://github.com/rogerchappel/policydiff.git
