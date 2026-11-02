@@ -31,7 +31,7 @@
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "npm run clean && tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run build && node --test dist/**/*.test.js",
+    "test": "npm run build && node scripts/run-tests.mjs",
     "smoke": "npm run build && node dist/src/cli.js compare fixtures/before fixtures/after --format text; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/src/cli.js compare fixtures/before fixtures/after --format json --output /tmp/policydiff-smoke.json; code=$?; if [ $code -ne 0 ] && [ $code -ne 2 ]; then exit $code; fi; node dist/src/cli.js explain /tmp/policydiff-smoke.json --format markdown",
     "package:identity": "node scripts/check-package-identity.mjs",
     "docs:check": "node scripts/check-readme-install.mjs",
