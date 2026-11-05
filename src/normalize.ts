@@ -4,7 +4,14 @@ export function normalize(value: JsonValue): JsonValue {
   if (Array.isArray(value)) return value.map((item) => normalize(item));
   if (value && typeof value === 'object') {
     const out: Record<string, JsonValue> = {};
-    for (const key of Object.keys(value).sort()) out[key] = normalize(value[key]);
+    for (const key of Object.keys(value).sort()) {
+      Object.defineProperty(out, key, {
+        value: normalize(value[key]),
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      });
+    }
     return out;
   }
   return value;
