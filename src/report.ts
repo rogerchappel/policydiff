@@ -11,7 +11,8 @@ export function summarize(files: ComparedFile[]): DiffReport['summary'] {
   return { filesCompared: files.length, changes, bySeverity, highestSeverity };
 }
 
-export function formatReport(report: DiffReport, format: 'text' | 'markdown' | 'json' = 'text'): string {
+export function formatReport(report: DiffReport, format: 'text' | 'markdown' | 'json' | 'sarif' = 'text'): string {
+  if (format === 'sarif') return formatSarif(report);
   if (format === 'json') return `${JSON.stringify(report, null, 2)}\n`;
   const md = format === 'markdown';
   const lines: string[] = [];
@@ -35,4 +36,29 @@ export function formatReport(report: DiffReport, format: 'text' | 'markdown' | '
 export async function emit(content: string, output?: string): Promise<void> {
   if (output) await writeFile(output, content, 'utf8');
   else process.stdout.write(content);
+}
+
+/** Serialize changes as SARIF 2.1.0 results for code-scanning consumers. */
+export function formatSarif(report: DiffReport): string {
+  const rules = new Map<string, { id: string; name: string }>();
+  const results = report.files.flatMap((file) => file.changes.map((change) => {
+    if (!rules.has(change.ruleId)) rules.set(change.ruleId, { id: change.ruleId, name: change.category });
+    const level = change.severity === 'critical' || change.severity === 'high' ? 'error'
+      : change.severity === 'medium' ? 'warning' : 'note';
+    return {
+      ruleId: change.ruleId,
+      level,
+      message: { text: change.message },
+      locations: [{ physicalLocation: { artifactLocation: { uri: file.path }, region: { startLine: 1 } } }],
+      partialFingerprints: { policydiffPath: change.path },
+    };
+  }));
+  return `${JSON.stringify({
+    $schema: 'https://json.schemastore.org/sarif-2.1.0.json',
+    version: '2.1.0',
+    runs: [{
+      tool: { driver: { name: 'policydiff', semanticVersion: report.version, rules: [...rules.values()] } },
+      results,
+    }],
+  }, null, 2)}\n`;
 }

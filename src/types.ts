@@ -37,5 +37,5 @@ export interface DiffReport {
   files: ComparedFile[];
 }
 
-export interface CompareOptions { format?: 'text' | 'markdown' | 'json'; output?: string; }
+export interface CompareOptions { format?: 'text' | 'markdown' | 'json' | 'sarif'; output?: string; }
 export interface ExplainOptions { format?: 'text' | 'markdown' | 'json'; output?: string; }
