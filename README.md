@@ -61,6 +61,7 @@ empty report.
 policydiff compare fixtures/before fixtures/after
 policydiff compare policy.before.yml policy.after.yml --format markdown
 policydiff compare before after --format json --output policydiff.json
+policydiff compare before after --format sarif --output policydiff.sarif.json
 ```
 
 Example text output:

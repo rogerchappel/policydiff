@@ -11,7 +11,7 @@ program.command('compare')
   .description('Compare JSON/YAML files or directories')
   .argument('<before>', 'before .json, .yaml, or .yml file, or directory')
   .argument('<after>', 'after .json, .yaml, or .yml file, or directory')
-  .option('-f, --format <format>', 'text, markdown, or json', 'text')
+  .option('-f, --format <format>', 'text, markdown, json, or sarif', 'text')
   .option('-o, --output <path>', 'write report to a file')
   .action(async (before: string, after: string, options: { format: string; output?: string }) => {
     const format = parseFormat(options.format);
@@ -27,12 +27,17 @@ program.command('explain')
   .option('-o, --output <path>', 'write explanation to a file')
   .action(async (reportPath: string, options: { format: string; output?: string }) => {
     const report = await loadReport(reportPath);
-    await emit(explainReport(report, parseFormat(options.format)), options.output);
+    await emit(explainReport(report, parseExplainFormat(options.format)), options.output);
   });
 
-function parseFormat(value: string): 'text' | 'markdown' | 'json' {
+function parseExplainFormat(value: string): 'text' | 'markdown' | 'json' {
   if (value === 'text' || value === 'markdown' || value === 'json') return value;
   throw new Error(`Unsupported format ${value}; expected text, markdown, or json`);
+}
+
+function parseFormat(value: string): 'text' | 'markdown' | 'json' | 'sarif' {
+  if (value === 'text' || value === 'markdown' || value === 'json' || value === 'sarif') return value;
+  throw new Error(`Unsupported format ${value}; expected text, markdown, json, or sarif`);
 }
 
 program.parseAsync(process.argv).catch((error: unknown) => {

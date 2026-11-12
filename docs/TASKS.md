@@ -14,6 +14,6 @@
 
 ## Next candidates
 
-- [ ] Add SARIF output for code scanning annotations.
+- [x] Add SARIF output for code scanning annotations.
 - [ ] Add more targeted Kubernetes and OpenAPI rule packs.
 - [ ] Add GitHub Action wrapper example.
