@@ -21,3 +21,9 @@ test('formatReport renders markdown heading and no-change files', () => {
   assert.match(output, /^# policydiff report/);
   assert.match(output, /- No changes\./);
 });
+
+test('formatReport URI-escapes SARIF artifact paths', () => {
+  const withChange: DiffReport = { ...report, files: [{ path: 'dir name/policy#1?.json', changes: [{ path: '/x', kind: 'changed', before: false, after: true, severity: 'low', category: 'permission', message: 'changed', ruleId: 'test' }] }] };
+  const sarif = JSON.parse(formatReport(withChange, 'sarif'));
+  assert.equal(sarif.runs[0].results[0].locations[0].physicalLocation.artifactLocation.uri, 'dir%20name/policy%231?.json');
+});
