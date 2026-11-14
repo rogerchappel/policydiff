@@ -49,7 +49,7 @@ export function formatSarif(report: DiffReport): string {
       ruleId: change.ruleId,
       level,
       message: { text: change.message },
-      locations: [{ physicalLocation: { artifactLocation: { uri: encodeURI(file.path.replaceAll('\\', '/')) }, region: { startLine: 1 } } }],
+      locations: [{ physicalLocation: { artifactLocation: { uri: encodeURI(file.path.replaceAll('\\', '/')).replaceAll('#', '%23').replaceAll('?', '%3F') }, region: { startLine: 1 } } }],
       partialFingerprints: { policydiffPath: change.path },
     };
   }));
