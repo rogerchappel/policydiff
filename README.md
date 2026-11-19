@@ -165,8 +165,19 @@ npm run check
 npm run build
 npm run smoke
 npm run package:smoke
+npm run package:identity
+npm run docs:check
+npm run release:contract
+npm run release:check
 bash scripts/validate.sh
 ```
+
+`package:identity` checks that the reserved npm package name is unclaimed or
+already belongs to this repository. `docs:check` validates the README's
+installation instructions against the package metadata. `release:contract`
+runs tests for the release workflow's packaging and tag contract. The aggregate
+`release:check` runs these release-readiness checks together with type, test,
+CLI smoke, and packaged-install verification.
 
 ## Exit codes
 
