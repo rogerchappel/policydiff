@@ -24,3 +24,24 @@ test('release hands the validated artifact path to GitHub', () => {
   assert.match(workflow, /steps\.package\.outputs\.artifact/);
   assert.doesNotMatch(workflow, /\*\.tgz/);
 });
+
+test('release grants exactly the permissions required to publish a GitHub release', () => {
+  const permissionsBlock = workflow.match(/^permissions:\r?\n((?:  [^\r\n]+\r?\n)+)/m);
+  assert.ok(permissionsBlock, 'release workflow must declare top-level permissions');
+
+  const permissions = Object.fromEntries(
+    permissionsBlock[1]
+      .trimEnd()
+      .split('\n')
+      .map((line) => {
+        const entry = line.match(/^  ([a-z-]+): (read|write|none)$/);
+        assert.ok(entry, `invalid permission declaration: ${line}`);
+        return [entry[1], entry[2]];
+      }),
+  );
+
+  assert.deepEqual(permissions, {
+    contents: 'write',
+    'id-token': 'write',
+  });
+});
