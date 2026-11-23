@@ -6,7 +6,7 @@
 
 The npm package name is reserved for this project but is not currently
 published, so `npm install @rogerchappel/policydiff` is not a supported install
-path. To install from source, you need Git, Node.js 20 or newer, npm, and network
+path. To install from source, you need Git, Node.js 20, 22, or 24 (the Node.js major versions tested in CI), npm, and network
 access to GitHub (to clone the repository) and the npm registry (to install the
 locked dependencies). From a clean checkout:
 
