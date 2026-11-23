@@ -12,6 +12,18 @@ const requiredSourceCommands = [
 ];
 
 const errors = [];
+const supportedNodeMajors = ['20', '22', '24'];
+const ciWorkflow = readFileSync(fileURLToPath(new URL('../.github/workflows/ci.yml', import.meta.url)), 'utf8');
+const matrixMatch = ciWorkflow.match(/node-version:\s*\[([^\]]+)\]/);
+const ciNodeMajors = matrixMatch?.[1].match(/\d+/g) ?? [];
+const readmeNodeMajors = readme.match(/Node\.js (\d+(?:, \d+)*(?:, or \d+)?)/)?.[1].match(/\d+/g) ?? [];
+
+if (JSON.stringify(ciNodeMajors) !== JSON.stringify(supportedNodeMajors)) {
+  errors.push(`CI Node.js matrix must be ${supportedNodeMajors.join(', ')}; found ${ciNodeMajors.join(', ') || 'none'}.`);
+}
+if (JSON.stringify(readmeNodeMajors) !== JSON.stringify(supportedNodeMajors)) {
+  errors.push(`README must list the CI-tested Node.js majors: ${supportedNodeMajors.join(', ')}.`);
+}
 
 if (readme.includes(unavailableRegistryInstall)) {
   errors.push(`README advertises unavailable npm install: ${unavailableRegistryInstall}`);
