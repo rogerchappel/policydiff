@@ -45,3 +45,13 @@ test('release grants exactly the permissions required to publish a GitHub releas
     'id-token': 'write',
   });
 });
+
+test('release installs npm 11.5.1 before dependency installation and publishing', () => {
+  const installNpm = workflow.indexOf('npm install --global npm@11.5.1');
+  const installDependencies = workflow.indexOf('run: npm ci');
+  const release = workflow.indexOf('gh release create');
+
+  assert.ok(installNpm >= 0, 'release must pin a trusted-publishing-compatible npm version');
+  assert.ok(installDependencies > installNpm, 'npm must be upgraded before npm ci');
+  assert.ok(release > installNpm, 'npm must be upgraded before publication');
+});
