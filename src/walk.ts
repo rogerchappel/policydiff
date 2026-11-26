@@ -18,6 +18,8 @@ async function listFiles(root: string): Promise<Map<string, string>> {
     for (const entry of await readdir(dir, { withFileTypes: true })) {
       if (entry.name === 'node_modules' || entry.name === '.git' || entry.name === 'dist') continue;
       const full = join(dir, entry.name);
+      // Do not follow symlinks: they can escape the input root or create cycles.
+      if (entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) await walk(full);
       else if (entry.isFile() && isSupportedPolicyFile(full)) files.set(relative(root, full), full);
     }
