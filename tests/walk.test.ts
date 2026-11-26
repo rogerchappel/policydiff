@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -30,6 +30,27 @@ for (const contents of ['unsupported', 'empty'] as const) {
     await assert.rejects(pairInputs(before, after), /No supported policy files found; expected JSON or YAML inputs/);
   });
 }
+
+test('pairInputs ignores symlinked files and directories without traversing outside the input root', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-walk-'));
+  const before = join(directory, 'before');
+  const after = join(directory, 'after');
+  const external = join(directory, 'external');
+  await Promise.all([mkdir(before), mkdir(after), mkdir(external)]);
+  await writeFile(join(external, 'policy.json'), '{"external":true}\\n');
+  await symlink(external, join(before, 'linked-directory'));
+  await symlink(join(external, 'policy.json'), join(after, 'linked-file.json'));
+  await Promise.all([
+    writeFile(join(before, 'policy.json'), '{}\\n'),
+    writeFile(join(after, 'policy.json'), '{}\\n'),
+  ]);
+
+  assert.deepEqual(await pairInputs(before, after), [{
+    relativePath: 'policy.json',
+    beforePath: join(before, 'policy.json'),
+    afterPath: join(after, 'policy.json'),
+  }]);
+});
 
 test('pairInputs retains supported files while ignoring adjacent unsupported files', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'policydiff-walk-'));
