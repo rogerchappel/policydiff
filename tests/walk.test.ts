@@ -52,6 +52,22 @@ test('pairInputs ignores symlinked files and directories without traversing outs
   }]);
 });
 
+test('pairInputs rejects a symlinked directory input root', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'policydiff-walk-'));
+  const before = join(directory, 'before');
+  const after = join(directory, 'after');
+  const external = join(directory, 'external');
+  const linkedRoot = join(directory, 'linked-root');
+  await Promise.all([mkdir(before), mkdir(after), mkdir(external)]);
+  await writeFile(join(before, 'policy.json'), '{}\n');
+  await writeFile(join(external, 'policy.json'), '{"external":true}\n');
+  await symlink(external, linkedRoot);
+
+  await assert.rejects(pairInputs(before, linkedRoot), {
+    message: `Input root must not be a symbolic link: ${linkedRoot}`,
+  });
+});
+
 test('pairInputs retains supported files while ignoring adjacent unsupported files', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'policydiff-walk-'));
   const before = join(directory, 'before');

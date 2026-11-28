@@ -1,4 +1,4 @@
-import { readdir, stat } from 'node:fs/promises';
+import { lstat, readdir, stat } from 'node:fs/promises';
 import { basename, join, relative } from 'node:path';
 import { isSupportedPolicyFile } from './parser.js';
 
@@ -6,7 +6,10 @@ export interface FilePair { relativePath: string; beforePath?: string; afterPath
 
 async function listFiles(root: string): Promise<Map<string, string>> {
   const files = new Map<string, string>();
-  const rootStat = await stat(root);
+  const rootStat = await lstat(root);
+  if (rootStat.isSymbolicLink()) {
+    throw new Error(`Input root must not be a symbolic link: ${root}`);
+  }
   if (rootStat.isFile()) {
     if (!isSupportedPolicyFile(root)) {
       throw new Error(`Unsupported policy file: ${root}; expected .json, .yaml, or .yml`);
